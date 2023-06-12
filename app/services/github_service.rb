@@ -12,6 +12,6 @@ class GithubService
     response = http.request(request)
     JSON.parse(response.read_body)
   rescue StandardError => e
-    raise "Unable to fetch user repositories: #{e.message}"
+    raise "Unable to fetch user repositories"
   end
 end
