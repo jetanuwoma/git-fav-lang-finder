@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Github Favorite Language</title>
+</head>
+<body>
+<h1>Github Favorite Language</h1>
+
+<% flash.each do |key, message| %>
+  <div class="<%= key %>">
+    <%= message %>
+  </div>
+<% end %>
+
+<%= form_tag favorite_language_path, method: :post do %>
+  <%= text_field_tag :username %>
+  <%= submit_tag 'Submit' %>
+<% end %>
+</body>
+</html>
+
