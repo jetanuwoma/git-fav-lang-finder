@@ -3,12 +3,9 @@ require 'rails_helper'
 RSpec.describe 'Users', type: :feature do
   it 'displays the favorite language after submitting the form' do
     username = 'testuser'
-    repositories = [
-      { 'name' => 'repo1', 'language' => 'Ruby' },
-      { 'name' => 'repo2', 'language' => 'JavaScript' }
-    ]
+    favorite_language = 'Ruby'
 
-    allow(GithubService).to receive(:get_repositories).and_return(repositories)
+    allow(GithubService).to receive(:get_favorite_language).and_return(favorite_language)
 
     visit root_path
 
@@ -29,7 +26,7 @@ RSpec.describe 'Users', type: :feature do
   it 'displays an error message when unable to fetch repositories' do
     username = 'testuser'
 
-    allow(GithubService).to receive(:get_repositories).and_raise("Unable to fetch user repositories")
+    allow(GithubService).to receive(:get_favorite_language).and_raise("Unable to fetch user repositories")
 
     visit root_path
 
