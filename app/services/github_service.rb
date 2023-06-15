@@ -1,17 +1,16 @@
-require 'net/http'
-require 'json'
-
 class GithubService
-  def self.get_repositories(username)
-    url = URI("https://api.github.com/users/#{username}/repos")
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true
+  def self.get_favorite_language(username)
+    client = Octokit::Client.new
 
-    request = Net::HTTP::Get.new(url)
+    repositories = client.repositories(username)
+    languages = Hash.new(0)
 
-    response = http.request(request)
-    JSON.parse(response.read_body)
-  rescue StandardError => e
+    repositories.each do |repo|
+      languages[repo.language] += 1 if repo.language
+    end
+
+    favorite_language = languages.max_by { |_, count| count }&.first || 'Unknown'
+  rescue Octokit::Error => e
     raise "Unable to fetch user repositories"
   end
 end

@@ -2,30 +2,37 @@ require 'rails_helper'
 
 RSpec.describe GithubService do
   describe '.get_repositories' do
-    it 'returns the user repositories' do
-      username = 'testuser'
-      repositories = [
-        { 'name' => 'repo1', 'language' => 'Ruby' },
-        { 'name' => 'repo2', 'language' => 'JavaScript' }
-      ]
+    describe '.get_favorite_language' do
+      it 'returns the user favorite language' do
+        username = 'testuser'
+        repositories = [
+          double(language: 'Ruby'),
+          double(language: 'JavaScript')
+        ]
+        allow_any_instance_of(Octokit::Client).to receive(:repositories).with(username).and_return(repositories)
 
-      stub_request(:get, "https://api.github.com/users/#{username}/repos")
-        .to_return(body: repositories.to_json, status: 200)
+        favorite_language = GithubService.get_favorite_language(username)
 
-      response = GithubService.get_repositories(username)
+        expect(favorite_language).to eq('Ruby')
+      end
 
-      expect(response).to eq(repositories)
-    end
+      it 'returns Unknown when user has no repositories' do
+        username = 'testuser'
+        repositories = []
+        allow_any_instance_of(Octokit::Client).to receive(:repositories).with(username).and_return(repositories)
 
-    it 'raises an error when unable to fetch repositories' do
-      username = 'testuser'
+        favorite_language = GithubService.get_favorite_language(username)
 
-      stub_request(:get, "https://api.github.com/users/#{username}/repos")
-        .to_return(status: 404)
+        expect(favorite_language).to eq('Unknown')
+      end
 
-      expect {
-        GithubService.get_repositories(username)
-      }.to raise_error.with_message("Unable to fetch user repositories")
+      it 'raises an error when unable to fetch repositories' do
+        username = 'testuser'
+        allow_any_instance_of(Octokit::Client).to receive(:repositories).with(username).and_raise(Octokit::Error)
+        expect {
+          GithubService.get_favorite_language(username)
+        }.to raise_error.with_message("Unable to fetch user repositories")
+      end
     end
   end
 end
